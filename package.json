@@ -1,0 +1,27 @@
+{
+  "name": "rlesports-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YassirKJS/rlesports-api.git"
+  },
+  "keywords": [],
+  "author": "Yassir Khchaf",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/YassirKJS/rlesports-api/issues"
+  },
+  "homepage": "https://github.com/YassirKJS/rlesports-api#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.3"
+  }
+}
