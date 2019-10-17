@@ -2,7 +2,20 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const saltRounds = 10;
-const cors = require('cors');
+const cors = require('cors'); // Cross-Origin Resource Sharing
+const knex = require('knex');
+
+const postgres = knex({
+  client: 'pg', // postgres
+  connection: {
+    host : '127.0.0.1',
+    user : 'postgres',
+    password : 'zenrae',
+    database : 'rlesportsDB'
+  }
+});
+
+console.log(postgres.select('*').from('users'));
 
 const app = express();
 
@@ -16,6 +29,7 @@ const db = {
       id: '123',
       username: 'rlesports',
       email: 'rlesports.feed@gmail.com',
+      password: 'banana',
       comments: 0,
       joined: new Date(),
     },
@@ -23,6 +37,7 @@ const db = {
       id: '124',
       username: 'Yassir',
       email: 'khchafyassir12@gmail.com',
+      password: 'muffin',
       comments: 0,
       joined: new Date(),
     }
@@ -44,7 +59,8 @@ app.get('/', (req, res) => {
 app.post('/signin', (req, res) => {
   // bcrypt.compareSync("not_bacon", hash);
   if (req.body.email === db.users[0].email && req.body.password === db.users[0].password)  {
-    res.json('success');  
+    //res.json('success');  
+    res.json(db.users[0]);
   }
   else {
     res.status(400).json('error logging in');
@@ -102,3 +118,4 @@ app.listen(3010, () => {
 });
 
 
+// CORS read more: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
