@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const saltRounds = 10;
 const cors = require('cors'); // Cross-Origin Resource Sharing
-const knex = require('knex');
+const knex = require('knex'); // http://knexjs.org/#Installation
 
 const db = knex({
   client: 'pg', // postgres
@@ -67,16 +67,31 @@ app.post('/signin', (req, res) => {
 
 app.post('/signup', (req, res) => {
   const {username, email, password} = req.body;   
-  // const hash = bcrypt.hashSync(password, saltRounds); 
-  db('users').returning('*').insert({ // returning('*') replaces select * after the insert
-    email: email,
-    username: username,
-    joined: new Date()
-  })
-    .then(user => {  // user[] is the response
-      res.json(user[0]);
+
+  const hash = bcrypt.hashSync(password, saltRounds); 
+
+  // we create a transaction trx when we have to do more than two things at once.
+  db.transaction(trx => {
+    trx.insert({
+      hash: hash,
+      email: email
     })
-    .catch(err => res.status(400).json('error: unable to sign up.'));
+    .into('login')
+    .returning('email')
+    .then(loginEmail => {
+      return trx('users').returning('*').insert({ // returning('*') replaces select * after the insert
+      email: loginEmail[0],
+      username: username,
+      joined: new Date()
+    })
+      .then(user => {  // user[] is the response
+        res.json(user[0]);
+      })      
+    })
+    .then(trx.commit)
+    .catch(trx.rollback)
+  })
+  .catch(err => res.status(400).json('error: unable to sign up.'));
 }) 
 
 app.get('/profile/:id', (req, res) => {
@@ -93,6 +108,8 @@ app.get('/profile/:id', (req, res) => {
     .catch(err => res.status(400).json('error: user not found'));
 })
 
+
+/*  see: https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/8862368#questions
 app.put('/comments', (req, res) => {
   const { id } = req.body;
   let found = false;
@@ -107,6 +124,7 @@ app.put('/comments', (req, res) => {
     res.status(404).json('no such user');
   }
 })
+*/
 
 
 app.listen(3010, () => {
